@@ -9,7 +9,7 @@
 MFRC522 rfid(SS_PIN, RST_PIN);  // Create MFRC522 instance
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   SPI.begin();                  // Init SPI bus
   rfid.PCD_Init();              // Init MFRC522
   Serial.println("Place your RFID card/tag near the reader...");

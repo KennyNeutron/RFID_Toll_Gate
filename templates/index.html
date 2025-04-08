@@ -1,16 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>RFID UID Viewer</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    h1 { font-size: 2.5em; color: #2c3e50; }
-    #uid { font-size: 2em; color: #34495e; }
-  </style>
-</head>
-<body>
-  <h1>Latest RFID UID</h1>
-  <p id="uid">Loading...</p>
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="text-center">
+    <h1 class="mt-4">Welcome to the RFID Toll Gate System</h1>
+    <p class="lead">Latest scanned RFID UID:</p>
+    <h2 class="display-4" id="uid">Loading...</h2>
+  </div>
 
   <script>
     function fetchUID() {
@@ -19,13 +14,12 @@
         .then(data => {
           document.getElementById('uid').textContent = data.uid;
         })
-        .catch(err => {
-          document.getElementById('uid').textContent = "Error fetching UID";
+        .catch(() => {
+          document.getElementById('uid').textContent = "Error reading UID";
         });
     }
 
-    setInterval(fetchUID, 1000); // every 1 second
-    fetchUID(); // initial call
+    setInterval(fetchUID, 1000);
+    fetchUID();
   </script>
-</body>
-</html>
+{% endblock %}

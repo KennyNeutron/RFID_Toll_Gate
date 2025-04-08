@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Register New RFID User</h2>
+  <form method="POST" action="/register">
+    <div class="mb-3">
+      <label for="rfid" class="form-label">RFID</label>
+      <input type="text" class="form-control" id="rfid" name="rfid" required>
+    </div>
+    <div class="mb-3">
+      <label for="name" class="form-label">Full Name</label>
+      <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="mb-3">
+      <label for="course" class="form-label">Course</label>
+      <input type="text" class="form-control" id="course" name="course" required>
+    </div>
+    <div class="mb-3">
+      <label for="year_level" class="form-label">Year Level</label>
+      <input type="text" class="form-control" id="year_level" name="year_level" required>
+    </div>
+    <div class="mb-3">
+        <label for="vehicle_type" class="form-label">Vehicle Type</label>
+        <input type="text" class="form-control" id="vehicle_type" name="vehicle_type" required>
+      </div>
+      <div class="mb-3">
+        <label for="plate_number" class="form-label">Plate Number</label>
+        <input type="text" class="form-control" id="plate_number" name="plate_number" required>
+      </div>
+      
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+
+  {% if message %}
+    <div class="alert alert-info mt-4">{{ message }}</div>
+  {% endif %}
+</div>
+{% endblock %}
