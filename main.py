@@ -165,6 +165,36 @@ def delete_logs(date):
         print(f"[ERROR] Failed to delete logs for {date}: {e}")
     return redirect('/logs?date=' + date)
 
+@app.route('/latest_transaction')
+def latest_transaction():
+    try:
+        conn = sqlite3.connect('rfid_gate.db')
+        c = conn.cursor()
+        c.execute('''
+            SELECT name, course, year_level, vehicle_type, plate_number,
+                   timestamp, entry_type
+            FROM logs
+            ORDER BY timestamp DESC
+            LIMIT 1
+        ''')
+        row = c.fetchone()
+        conn.close()
+
+        if row:
+            return jsonify({
+                "name": row[0],
+                "course": row[1],
+                "year_level": row[2],
+                "vehicle_type": row[3],
+                "plate_number": row[4],
+                "timestamp": row[5],
+                "entry_type": row[6]
+            })
+        else:
+            return jsonify({"status": "no_logs"})
+    except Exception as e:
+        print("[ERROR] latest_transaction:", e)
+        return jsonify({"status": "error"})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
