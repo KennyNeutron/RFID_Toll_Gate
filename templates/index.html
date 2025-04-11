@@ -9,21 +9,6 @@
     <h3 id="transaction">Loading...</h3>
   </div>
 
-  <script>
-    function fetchUID() {
-      fetch('/uid')
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('rfid').textContent = data.rfid;
-          document.getElementById('transaction').textContent = data.transaction_type;
-        })
-        .catch(() => {
-          document.getElementById('rfid').textContent = "Error";
-          document.getElementById('transaction').textContent = "Error";
-        });
-    }
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 
-    setInterval(fetchUID, 1000);
-    fetchUID();
-  </script>
 {% endblock %}

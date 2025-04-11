@@ -152,5 +152,19 @@ def logs():
     conn.close()
     return render_template('logs.html', logs=logs_data, selected_date=selected_date)
 
+@app.route('/delete_logs/<date>', methods=['POST'])
+def delete_logs(date):
+    try:
+        conn = sqlite3.connect('rfid_gate.db')
+        c = conn.cursor()
+        c.execute("DELETE FROM logs WHERE DATE(timestamp) = ?", (date,))
+        conn.commit()
+        conn.close()
+        print(f"[DELETED] Logs for {date}")
+    except Exception as e:
+        print(f"[ERROR] Failed to delete logs for {date}: {e}")
+    return redirect('/logs?date=' + date)
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
