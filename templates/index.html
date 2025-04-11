@@ -1,20 +1,25 @@
 {% extends "base.html" %}
-
 {% block content %}
+<div class="container mt-5">
   <div class="text-center">
-    <h1 class="mt-4">Welcome to the RFID Toll Gate System</h1>
-    <h4 class="mt-4">Last Transaction</h4>
-
-    <div id="latest-transaction" class="mt-3">
-      <p><strong>Name:</strong> <span id="name">Loading...</span></p>
-      <p><strong>Course:</strong> <span id="course">Loading...</span></p>
-      <p><strong>Year Level:</strong> <span id="year_level">Loading...</span></p>
-      <p><strong>Vehicle Type:</strong> <span id="vehicle_type">Loading...</span></p>
-      <p><strong>Plate Number:</strong> <span id="plate_number">Loading...</span></p>
-      <p><strong>Entry Type:</strong> <span id="entry_type">Loading...</span></p>
-      <p><strong>Timestamp:</strong> <span id="timestamp">Loading...</span></p>
-    </div>
+    <h1 class="mb-4 display-5">Welcome to the RFID Toll Gate System</h1>
+    <h4 class="mb-3 text-muted">Latest Transaction</h4>
   </div>
 
-  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+  <div class="d-flex justify-content-center">
+    <div class="card shadow p-4 fs-5" style="max-width: 600px; width: 100%;">
+      <div class="card-body" id="latest-transaction">
+        <p><strong>Name:</strong> <span id="name" class="text-primary">Loading...</span></p>
+        <p><strong>Course:</strong> <span id="course">Loading...</span></p>
+        <p><strong>Year Level:</strong> <span id="year_level">Loading...</span></p>
+        <p><strong>Vehicle Type:</strong> <span id="vehicle_type">Loading...</span></p>
+        <p><strong>Plate Number:</strong> <span id="plate_number">Loading...</span></p>
+        <p><strong>Entry Type:</strong> <span id="entry_type">Loading...</span></p>
+        <p><strong>Timestamp:</strong> <span id="timestamp">Loading...</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='scripts.js') }}"></script>
 {% endblock %}
