@@ -196,5 +196,19 @@ def latest_transaction():
         print("[ERROR] latest_transaction:", e)
         return jsonify({"status": "error"})
 
+@app.route('/delete_user/<rfid>', methods=['POST'])
+def delete_user(rfid):
+    try:
+        conn = sqlite3.connect('rfid_gate.db')
+        c = conn.cursor()
+        c.execute("DELETE FROM users WHERE rfid = ?", (rfid,))
+        conn.commit()
+        conn.close()
+        print(f"[DELETED USER] RFID: {rfid}")
+    except Exception as e:
+        print(f"[ERROR] Failed to delete user {rfid}: {e}")
+    return redirect('/users')
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

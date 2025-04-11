@@ -16,19 +16,29 @@
 </head>
 <body>
   <!-- ✅ Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">RFID Toll Gate</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
-          <li class="nav-item"><a class="nav-link" href="/users">Users</a></li>
-          <li class="nav-item"><a class="nav-link" href="/logs">Logs</a></li>
-        </ul>
-      </div>
+<!-- ✅ Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">RFID Toll Gate</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/' %}active text-warning fw-bold{% endif %}" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path.startswith('/register') %}active text-warning fw-bold{% endif %}" href="/register">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/users' %}active text-warning fw-bold{% endif %}" href="/users">Users</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path.startswith('/logs') %}active text-warning fw-bold{% endif %}" href="/logs">Logs</a>
+        </li>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
 
   <!-- ✅ Main Content -->
   <div class="container">
