@@ -38,7 +38,23 @@ def log_transaction(rfid, entry_type):
             conn.commit()
             print(f"[LOGGED] {rfid} | {entry_type} @ {timestamp}")
         else:
-            print(f"[WARNING] UID {rfid} not found in users.")
+            name = f"UNKNOWN: {rfid}"
+            course = year_level = vehicle_type = plate_number = ""
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            c.execute('''
+                INSERT INTO logs (
+                    rfid, name, course, year_level, vehicle_type,
+                    plate_number, timestamp, entry_type
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                rfid, name, course, year_level, vehicle_type,
+                plate_number, timestamp, entry_type
+            ))
+
+            conn.commit()
+            print(f"[LOGGED UNKNOWN] {rfid} | {entry_type} @ {timestamp}")
+
         conn.close()
     except Exception as e:
         print("[ERROR - logging]:", e)
