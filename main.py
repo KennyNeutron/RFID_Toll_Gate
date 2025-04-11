@@ -16,11 +16,17 @@ def read_rfid():
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
         while True:
             line = ser.readline().decode('utf-8').strip()
-            if line.startswith("Card UID:"):
-                uid_match = re.search(r'Card UID:\s*(.*)', line)
-                if uid_match:
-                    latest_uid = uid_match.group(1)
-                    print("Extracted UID:", latest_uid)
+            if line.startswith("Role:"):
+                try:
+                    role = int(line.split(":")[1].strip())
+                    uid_line = ser.readline().decode('utf-8').strip()
+                    if uid_line.startswith("UID:"):
+                        uid = uid_line.split(":")[1].strip()
+                        latest_uid = f"{uid} {role}"
+                        print("Extracted UID & Role:", latest_uid)
+                except Exception as e:
+                    print("[Parse Error]", e)
+
     except Exception as e:
         latest_uid = f"Serial error: {e}"
         print("[ERROR]", e)
@@ -34,7 +40,14 @@ def index():
 
 @app.route('/uid')
 def get_uid():
-    return jsonify(uid=latest_uid)
+    try:
+        uid, role = latest_uid.strip().split()
+        role = int(role)
+        transaction = "Entry" if role == 1 else "Exit" if role == 2 else "Unknown"
+        return jsonify(rfid=uid, transaction_type=transaction)
+    except Exception:
+        return jsonify(rfid="N/A", transaction_type="N/A")
+
 
 
 

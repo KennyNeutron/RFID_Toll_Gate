@@ -23,25 +23,21 @@ void setup() {
 void loop() {
   int packetSize = LoRa.parsePacket();
   if (packetSize == sizeof(payload)) {
-    LED_BuiltIn_On();
-
     LoRa.readBytes((uint8_t*)&payload, sizeof(payload));
 
-    Serial.println(">> Structured Packet Received <<");
-    Serial.print("Header: ");
-    Serial.print(payload.header0, HEX);
-    Serial.print(" ");
-    Serial.println(payload.header1, HEX);
+    // Extracted data
+    uint8_t role = payload.SlaveRole;
+    String uid = String(payload.uid);
 
-    Serial.print("Role: 0x");
-    Serial.println(payload.SlaveRole, HEX);
-
-    Serial.print("UID : ");
-    Serial.println(payload.uid);
-
-    Serial.print("Footer: 0x");
-    Serial.println(payload.footer, HEX);
-
-    LED_BuiltIn_Off();
+    // Now send `role` and `uid` to Flask
+    sendToFlask(role, uid);
   }
+}
+
+void sendToFlask(uint8_t role, String uid) {
+  // Send `role` and `uid` to Flask
+  Serial.print("Role: ");
+  Serial.println(role);
+  Serial.print("UID: ");
+  Serial.println(uid);
 }

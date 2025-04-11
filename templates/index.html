@@ -4,7 +4,9 @@
   <div class="text-center">
     <h1 class="mt-4">Welcome to the RFID Toll Gate System</h1>
     <p class="lead">Latest scanned RFID UID:</p>
-    <h2 class="display-4" id="uid">Loading...</h2>
+    <h2 class="display-4" id="rfid">Loading...</h2>
+    <p class="lead mt-3">Transaction Type:</p>
+    <h3 id="transaction">Loading...</h3>
   </div>
 
   <script>
@@ -12,10 +14,12 @@
       fetch('/uid')
         .then(response => response.json())
         .then(data => {
-          document.getElementById('uid').textContent = data.uid;
+          document.getElementById('rfid').textContent = data.rfid;
+          document.getElementById('transaction').textContent = data.transaction_type;
         })
         .catch(() => {
-          document.getElementById('uid').textContent = "Error reading UID";
+          document.getElementById('rfid').textContent = "Error";
+          document.getElementById('transaction').textContent = "Error";
         });
     }
 
