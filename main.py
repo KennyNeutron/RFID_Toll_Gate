@@ -3,6 +3,7 @@ import serial
 import threading
 import sqlite3
 from datetime import datetime
+from collections import defaultdict
 
 app = Flask(__name__)
 
@@ -18,46 +19,52 @@ def log_transaction(rfid, entry_type):
     try:
         conn = sqlite3.connect('rfid_gate.db')
         c = conn.cursor()
+
+        # ✅ Check the latest entry_type for this RFID
+        c.execute('''
+            SELECT entry_type FROM logs
+            WHERE rfid = ?
+            ORDER BY timestamp DESC
+            LIMIT 1
+        ''', (rfid,))
+        last_entry = c.fetchone()
+
+        # ✅ Skip if same as last entry_type
+        if last_entry and last_entry[0] == entry_type:
+            print(f"[SKIPPED] Duplicate entry_type '{entry_type}' for RFID {rfid}")
+            conn.close()
+            return
+
+        # ✅ Fetch user details
         c.execute("SELECT name, course, year_level, vehicle_type, plate_number FROM users WHERE rfid = ?", (rfid,))
         result = c.fetchone()
 
         if result:
             name, course, year_level, vehicle_type, plate_number = result
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-            c.execute('''
-                INSERT INTO logs (
-                    rfid, name, course, year_level, vehicle_type,
-                    plate_number, timestamp, entry_type
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                rfid, name, course, year_level, vehicle_type,
-                plate_number, timestamp, entry_type
-            ))
-
-            conn.commit()
-            print(f"[LOGGED] {rfid} | {entry_type} @ {timestamp}")
         else:
             name = f"UNKNOWN: {rfid}"
             course = year_level = vehicle_type = plate_number = ""
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            c.execute('''
-                INSERT INTO logs (
-                    rfid, name, course, year_level, vehicle_type,
-                    plate_number, timestamp, entry_type
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+        # ✅ Insert new log
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        c.execute('''
+            INSERT INTO logs (
                 rfid, name, course, year_level, vehicle_type,
                 plate_number, timestamp, entry_type
-            ))
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            rfid, name, course, year_level, vehicle_type,
+            plate_number, timestamp, entry_type
+        ))
 
-            conn.commit()
-            print(f"[LOGGED UNKNOWN] {rfid} | {entry_type} @ {timestamp}")
-
+        conn.commit()
         conn.close()
+
+        print(f"[LOGGED] {name} ({rfid}) | {entry_type} @ {timestamp}")
+
     except Exception as e:
         print("[ERROR - logging]:", e)
+
 
 # ✅ Serial reading + logging
 def read_rfid():
@@ -225,6 +232,38 @@ def delete_user(rfid):
         print(f"[ERROR] Failed to delete user {rfid}: {e}")
     return redirect('/users')
 
+@app.route('/current_counts')
+def current_counts():
+    try:
+        conn = sqlite3.connect('rfid_gate.db')
+        c = conn.cursor()
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        c.execute('''
+            SELECT vehicle_type, entry_type
+            FROM logs
+            WHERE DATE(timestamp) = ?
+        ''', (today,))
+
+        logs = c.fetchall()
+        conn.close()
+
+        counts = defaultdict(int)
+        for vehicle_type, entry_type in logs:
+            key = vehicle_type.strip().lower()
+            if entry_type == 'enter':
+                counts[key] += 1
+            elif entry_type == 'exit':
+                counts[key] -= 1
+
+        return jsonify({
+            "motorcycles": max(counts.get("motorcycle", 0), 0),
+            "cars": max(counts.get("car", 0), 0)
+        })
+
+    except Exception as e:
+        print("[ERROR] current_counts:", e)
+        return jsonify({"motorcycles": 0, "cars": 0, "status": "error"})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

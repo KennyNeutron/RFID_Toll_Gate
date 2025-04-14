@@ -1,25 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-  <div class="text-center">
-    <h1 class="mb-4 display-5">Welcome to the RFID Toll Gate System</h1>
-    <h4 class="mb-3 text-muted">Latest Transaction</h4>
+
+<div id="wrapper" style="display: flex; width: 100vw; min-height: 100vh;">
+  <!-- Sidebar -->
+  <div id="sidebar" class="bg-dark text-light px-4 py-5" style="width: 280px;">
+    <h5>Vehicles Inside Today</h5>
+    <p><strong>Motorcycles:</strong> <span id="motorcycle-count" class="text-success">Loading...</span></p>
+    <p><strong>Cars:</strong> <span id="car-count" class="text-success">Loading...</span></p>
   </div>
 
-  <div class="d-flex justify-content-center">
-    <div class="card shadow p-4 fs-5" style="max-width: 600px; width: 100%;">
+  <!-- Main Content -->
+  <div id="main-content" class="bg-secondary.bg-gradient py-3 px-5" style="flex-grow: 1;">
+    <h1 class="display-5">Welcome to the RFID Toll Gate System</h1>
+    <h4 class="text-muted">Latest Transaction</h4>
+
+    <div class="card .bg-primary shadow p-4 fs-5" style="max-width: 600px;">
       <div class="card-body" id="latest-transaction">
-        <p><strong>Name:</strong> <span id="name" class="text-primary">Loading...</span></p>
-        <p><strong>Course:</strong> <span id="course">Loading...</span></p>
-        <p><strong>Year Level:</strong> <span id="year_level">Loading...</span></p>
-        <p><strong>Vehicle Type:</strong> <span id="vehicle_type">Loading...</span></p>
-        <p><strong>Plate Number:</strong> <span id="plate_number">Loading...</span></p>
-        <p><strong>Entry Type:</strong> <span id="entry_type">Loading...</span></p>
-        <p><strong>Timestamp:</strong> <span id="timestamp">Loading...</span></p>
+        <p><strong class="text-success">Name:</strong> <span id="name" class="text-info">Loading...</span></p>
+        <p><strong class="text-success">Course:</strong> <span id="course">Loading...</span></p>
+        <p><strong class="text-success">Year Level:</strong> <span id="year_level">Loading...</span></p>
+        <p><strong class="text-success">Vehicle Type:</strong> <span id="vehicle_type">Loading...</span></p>
+        <p><strong class="text-success">Plate Number:</strong> <span id="plate_number">Loading...</span></p>
+        <p><strong class="text-success">Entry Type:</strong> <span id="entry_type">Loading...</span></p>
+        <p><strong class="text-success">Timestamp:</strong> <span id="timestamp">Loading...</span></p>
       </div>
     </div>
   </div>
 </div>
 
+
 <script src="{{ url_for('static', filename='scripts.js') }}"></script>
-{% endblock %}
+
+{% endblock %}SS

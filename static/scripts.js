@@ -28,3 +28,21 @@ function fetchLatestTransaction() {
 // Refresh every second
 setInterval(fetchLatestTransaction, 1000);
 fetchLatestTransaction(); // initial call
+
+function fetchCounts() {
+  fetch('/current_counts')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("motorcycle-count").textContent = data.motorcycles;
+      document.getElementById("car-count").textContent = data.cars;
+    })
+    .catch(err => {
+      console.error("Count fetch error:", err);
+      document.getElementById("motorcycle-count").textContent = "Error";
+      document.getElementById("car-count").textContent = "Error";
+    });
+}
+
+setInterval(fetchCounts, 1000);
+fetchCounts(); // Initial fetch
+

@@ -29,7 +29,7 @@ void setup() {
   payload.header0 = 0xaa;
   payload.header1 = 0xbb;
   payload.footer = 0xcc;
-  payload.SlaveRole = 0x01;
+  payload.SlaveRole = 0x02;
 }
 
 void loop() {
