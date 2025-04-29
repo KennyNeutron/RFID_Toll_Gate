@@ -4,6 +4,7 @@ import threading
 import sqlite3
 from datetime import datetime
 from collections import defaultdict
+import time
 
 app = Flask(__name__)
 
@@ -13,6 +14,53 @@ latest_data = {
     "rfid": "Waiting...",
     "transaction_type": "Waiting..."
 }
+
+# ✅ Periodically send vehicle counts over serial
+def send_vehicle_counts():
+    def send_loop():
+        while True:
+            try:
+                ser_out = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+                time.sleep(2)  # Let Arduino reset
+                conn = sqlite3.connect('rfid_gate.db')
+                c = conn.cursor()
+                today = datetime.now().strftime("%Y-%m-%d")
+                c.execute('''
+                    SELECT vehicle_type, entry_type
+                    FROM logs
+                    WHERE DATE(timestamp) = ?
+                ''', (today,))
+                logs = c.fetchall()
+                conn.close()
+
+                counts = defaultdict(int)
+                for vehicle_type, entry_type in logs:
+                    key = vehicle_type.strip().lower()
+                    if entry_type == 'enter':
+                        counts[key] += 1
+                    elif entry_type == 'exit':
+                        counts[key] -= 1
+
+                motorcycles = max(counts.get("motorcycle", 0), 0)
+                cars = max(counts.get("car", 0), 0)
+
+                serial_data = f"SM:{motorcycles},C:{cars}\n"
+                ser_out.write(serial_data.encode('utf-8'))
+                print(f"Serial Data Sent to Serial: {serial_data.strip()}")
+
+                time.sleep(0.2)
+                while ser_out.in_waiting:
+                    response = ser_out.readline().decode('utf-8', errors='ignore').strip()
+                    print("[Arduino RX]:", response)
+
+                ser_out.close()
+            except Exception as e:
+                print("[ERROR - send_vehicle_counts]:", e)
+
+            time.sleep(3)  # Wait 3 seconds before repeating
+
+    threading.Thread(target=send_loop, daemon=True).start()
+
 
 # ✅ Logging function
 def log_transaction(rfid, entry_type):
@@ -61,6 +109,7 @@ def log_transaction(rfid, entry_type):
         conn.close()
 
         print(f"[LOGGED] {name} ({rfid}) | {entry_type} @ {timestamp}")
+        send_vehicle_counts()
 
     except Exception as e:
         print("[ERROR - logging]:", e)
@@ -100,6 +149,8 @@ def read_rfid():
 
 # ✅ Background thread
 threading.Thread(target=read_rfid, daemon=True).start()
+send_vehicle_counts()
+
 
 # ✅ Web routes
 @app.route('/')
